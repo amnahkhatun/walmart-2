@@ -1,17 +1,65 @@
+// import React from "react";
+// import ReactDOM from "react-dom";
+// import "./index.css";
+// import App from "./App";
+// import * as serviceWorker from "./serviceWorker";
+
+// ReactDOM.render(
+//   <React.StrictMode>
+//     <App />
+//   </React.StrictMode>,
+//   document.getElementById("root")
+// );
+
+// // If you want your app to work offline and load faster, you can change
+// // unregister() to register() below. Note this comes with some pitfalls.
+// // Learn more about service workers: https://bit.ly/CRA-PWA
+// serviceWorker.unregister();
+
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./App";
-import * as serviceWorker from "./serviceWorker";
+import { applyMiddleware, createStore, compose } from "redux";
+import { Provider } from "react-redux";
+import createSagaMiddleware from "redux-saga";
+import { routerMiddleware } from "react-router-redux";
+// import { history } from "./history";
+import { Router } from "react-router-dom";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById("root")
+// Import all of our components
+import App from "./App";
+import "./index.css";
+
+// Import the index reducer and sagas
+import IndexReducer from "./index-reducer";
+import IndexSagas from "./index-sagas";
+
+// Setup the middleware to watch between the Reducers and the Actions
+const sagaMiddleware = createSagaMiddleware();
+
+// const routersMiddleware = routerMiddleware(history);
+
+/*eslint-disable */
+const composeSetup =
+  process.env.NODE_ENV !== "production" &&
+  typeof window === "object" &&
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    : compose;
+/*eslint-enable */
+
+const store = createStore(
+  IndexReducer,
+  composeSetup(applyMiddleware(sagaMiddleware)) // allows redux devtools to watch sagas
 );
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+// Begin our Index Saga
+sagaMiddleware.run(IndexSagas);
+
+ReactDOM.render(
+  <Provider store={store}>
+    {/* <Router history={history}> */}
+    <App />
+    {/* </Router> */}
+  </Provider>,
+  document.getElementById("root")
+);
