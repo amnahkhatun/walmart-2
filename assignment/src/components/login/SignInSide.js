@@ -7,11 +7,11 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import Link from "@material-ui/core/Link";
 import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
+import { useForm } from "react-hook-form";
 
 import { useHistory } from "react-router-dom";
 
@@ -52,17 +52,25 @@ export default function SignInSide() {
   const classes = useStyles();
   const history = useHistory();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
+  const { register, password, handleSubmit, errors } = useForm();
 
-  function validateForm() {
-    return email.length > 0 && password.length > 0;
-  }
+  // function validateForm() {
+  //   return email.length > 0 && password.length > 0;
+  // }
 
-  function handleSubmit(event) {
-    // event.preventDefault();
+  // function handleSubmit(event) {
+  //   // event.preventDefault();
+  //   history.push("/dashboard");
+  // }
+
+  const onSubmit = (data, e) => {
+    e.preventDefault();
+    console.log(data);
     history.push("/dashboard");
-  }
+  };
+
   return (
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
@@ -75,7 +83,12 @@ export default function SignInSide() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <form className={classes.form} noValidate onSubmit={handleSubmit}>
+          <form
+            className={classes.form}
+            noValidate
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+          >
             <TextField
               variant="outlined"
               margin="normal"
@@ -87,9 +100,14 @@ export default function SignInSide() {
               autoComplete="email"
               autoFocus
               type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              // value={email}
+              error={!!errors.email}
+              inputRef={register({
+                pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+              })}
+              // onChange={e => setEmail(e.target.value)}
             />
+            <p>{errors.email && "Invalid email address"}</p>
 
             <TextField
               variant="outlined"
@@ -101,9 +119,18 @@ export default function SignInSide() {
               type="password"
               id="password"
               autoComplete="current-password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
+              error={!!errors.password}
+              inputRef={register({
+                pattern: /(?=.*[!@#$%^&*])/
+              })}
+              // value={password}
+              // onChange={e => setPassword(e.target.value)}
             />
+            <p>
+              {errors.password &&
+                "Password should contain atleast one capital letter and a special character"}
+            </p>
+
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
@@ -114,7 +141,7 @@ export default function SignInSide() {
               variant="contained"
               color="primary"
               className={classes.submit}
-              disabled={!validateForm()}
+              // disabled={!validateForm()}
             >
               Sign In
             </Button>
