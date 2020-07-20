@@ -12,8 +12,14 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import { useForm } from "react-hook-form";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
 
 import { useHistory } from "react-router-dom";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -45,6 +51,12 @@ const useStyles = makeStyles(theme => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2)
+  },
+  root: {
+    width: "100%",
+    "& > * + *": {
+      marginTop: theme.spacing(2)
+    }
   }
 }));
 
@@ -52,23 +64,26 @@ export default function SignInSide() {
   const classes = useStyles();
   const history = useHistory();
 
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
-  const { register, password, handleSubmit, errors } = useForm();
-
-  // function validateForm() {
-  //   return email.length > 0 && password.length > 0;
-  // }
-
-  // function handleSubmit(event) {
-  //   // event.preventDefault();
-  //   history.push("/dashboard");
-  // }
+  const [email, setEmail] = useState("admin@gmail.com");
+  const [password, setPassword] = useState("admin@123");
+  const { register, handleSubmit, errors } = useForm();
 
   const onSubmit = (data, e) => {
-    e.preventDefault();
-    console.log(data);
-    history.push("/dashboard");
+    if (email === "admin@gmail.com" && password === "admin@123") {
+      history.push("/dashboard");
+    } else {
+      return (
+        <Alert severity="error">Please enter the correct credentials</Alert>
+      );
+    }
+  };
+  const handleChange = email => {
+    setEmail(email);
+    console.log(email);
+  };
+  const handleChange1 = pwd => {
+    setPassword(pwd);
+    console.log(pwd);
   };
 
   return (
@@ -105,7 +120,7 @@ export default function SignInSide() {
               inputRef={register({
                 pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
               })}
-              // onChange={e => setEmail(e.target.value)}
+              onChange={e => handleChange(e.target.value)}
             />
             <p>{errors.email && "Invalid email address"}</p>
 
@@ -124,7 +139,7 @@ export default function SignInSide() {
                 pattern: /(?=.*[!@#$%^&*])/
               })}
               // value={password}
-              // onChange={e => setPassword(e.target.value)}
+              onChange={e => handleChange1(e.target.value)}
             />
             <p>
               {errors.password &&
